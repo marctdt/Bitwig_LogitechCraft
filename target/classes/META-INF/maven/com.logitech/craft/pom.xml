@@ -22,7 +22,29 @@
 			<groupId>com.bitwig</groupId>
 			<artifactId>extension-api</artifactId>
 			<version>7</version>
+			<scope>provided</scope>
 		</dependency>
+		<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.8.5</version>
+</dependency>
+		
+		
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty.websocket/websocket-client -->
+<dependency>
+    <groupId>org.eclipse.jetty.websocket</groupId>
+    <artifactId>websocket-client</artifactId>
+    <version>9.4.14.v20181114</version>
+</dependency>
+		<!-- https://mvnrepository.com/artifact/javax.websocket/javax.websocket-client-api -->
+<!-- <dependency> -->
+<!--     <groupId>javax.websocket</groupId> -->
+<!--     <artifactId>javax.websocket-client-api</artifactId> -->
+<!--     <version>1.1</version> -->
+<!-- </dependency> -->
+		
+		
 	</dependencies>
 
 	<build>
@@ -41,6 +63,24 @@
 				</configuration>
 			</plugin>
 
+      <!-- any other plugins -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+  
 			<plugin>
 				<groupId>com.coderplus.maven.plugins</groupId>
 				<artifactId>copy-rename-maven-plugin</artifactId>
@@ -53,7 +93,7 @@
 							<goal>copy</goal>
 						</goals>
 						<configuration>
-							<sourceFile>${project.build.directory}/${project.build.finalName}.jar</sourceFile>
+							<sourceFile>${project.build.directory}/${project.build.finalName}-jar-with-dependencies.jar</sourceFile>
 							<destinationFile>${project.build.directory}/Craft.bwextension</destinationFile>
 						</configuration>
 					</execution>

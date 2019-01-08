@@ -1,13 +1,8 @@
 package com.logitech;
 
-import com.bitwig.extension.controller.api.ControllerHost;
-import com.bitwig.extension.controller.api.Transport;
-import com.logitech.connectivity.CraftSocketConnection;
-
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-
 import com.bitwig.extension.controller.ControllerExtension;
+import com.bitwig.extension.controller.api.ControllerHost;
+import com.logitech.Device.Craft;
 
 public class CraftExtension extends ControllerExtension
 {
@@ -20,19 +15,12 @@ public class CraftExtension extends ControllerExtension
    public void init()
    {
       final ControllerHost host = getHost();      
-
       // TODO: Perform your driver initialization here.
       // For now just show a popup notification for verification that it is running.
       host.showPopupNotification("Craft Initialized");
-      try {
-		CraftSocketConnection connection = new CraftSocketConnection();
-		host.println(connection.value);
-		host.println(connection.isConnected()?"Connected" : "Not Connected");
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		host.println("Cannot connect to Craft! Make sure it is connected");
-	}
+    
+      Craft device=new Craft(host);
+      device.ConnectionToCraftDevice();
    }
 
    @Override
