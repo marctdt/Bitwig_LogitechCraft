@@ -15,6 +15,8 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.api.extensions.Frame;
 
 import com.bitwig.extension.controller.api.ControllerHost;
+import com.google.gson.Gson;
+import com.logitech.CrownObject;
 
 @WebSocket
 public class CraftSocketConnection extends Observable{
@@ -63,24 +65,18 @@ host.println("send connection Request: " + request);
 	@OnWebSocketMessage
 	public void onMessage(Session session,String message) {
 		setChanged();
-		notifyObservers(message);
-		host.println(message);
+		CrownObject co = new Gson().fromJson(message,CrownObject.class);
+		notifyObservers(co);
 	}
 
-@OnWebSocketFrame
-public void onFrame(Frame test)
-{
-	
-	host.println("Frame "+test);
+//@OnWebSocketFrame
+//public void onFrame(Frame test)
+//{
+//	
+//	host.println("Frame "+test);
+//
+//}
 
-}
-
-@OnWebSocketMessage
-public void onWebSocketBinary(byte[] payload,
-                                                  int offset,
-                                                  int length) {
-	host.println("Byte: "+ payload);
-}
 
 	@OnWebSocketError
     public void onError(Throwable t) {

@@ -12,6 +12,7 @@ import com.bitwig.extension.callback.BooleanValueChangedCallback;
 import com.bitwig.extension.controller.api.ControllerHost;
 import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.Transport;
+import com.logitech.CrownObject;
 import com.logitech.connectivity.CraftSocketConnection;
 
 public class Craft implements Observer{
@@ -80,6 +81,12 @@ private Transport transport;
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		// TODO Auto-generated method stub
+		CrownObject co = ((CrownObject)arg1);
+		host.println(co.message_type);
+		if(co.message_type.toLowerCase().equals("crown_turn_event"))
+		{
+			transport.incPosition(co.delta, true);
+		}
 		
 
 	}
