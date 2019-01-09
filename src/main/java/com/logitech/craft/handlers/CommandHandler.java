@@ -39,14 +39,5 @@ public class CommandHandler {
 	}
 	
 	
-	 public void toolChange(String contextName) throws IOException
-     {
-             ToolChangeObject toolChangeObject = new ToolChangeObject();
-             toolChangeObject.message_type = "tool_change";
-             toolChangeObject.session_id = getSessionId();
-             toolChangeObject.tool_id = contextName;
-
-             craft.sendMessagetoCraft(new Gson().toJson(toolChangeObject));
-
-     }
+	
 }

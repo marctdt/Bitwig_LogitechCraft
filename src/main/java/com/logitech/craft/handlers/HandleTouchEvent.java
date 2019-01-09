@@ -1,23 +1,20 @@
 package com.logitech.craft.handlers;
 
 import com.bitwig.extension.controller.api.ControllerHost;
+import com.logitech.craft.Craft;
 import com.logitech.craft.dataobjects.CrownRootObject;
 
 public class HandleTouchEvent implements Handler{
 
-	ControllerHost host;
+	Craft craft;
 	
-	public HandleTouchEvent(ControllerHost host) {
-		this.host=host;
+	public HandleTouchEvent(Craft craft) {
+		this.craft = craft;
     }
 
 	@Override
 	public void handle(CrownRootObject co) {
-
-		co.tas
-		if (host.)
-		
-		
+		craft.selectNextTool();
 	}
 
 	@Override

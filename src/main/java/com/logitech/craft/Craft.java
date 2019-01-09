@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.logitech.connectivity.CraftSocketConnection;
 import com.logitech.craft.dataobjects.CrownRegisterRootObject;
 import com.logitech.craft.dataobjects.CrownRootObject;
+import com.logitech.craft.dataobjects.ToolChangeObject;
 import com.logitech.craft.handlers.CommandHandler;
 
 public class Craft implements Observer {
@@ -27,6 +28,8 @@ public class Craft implements Observer {
 
 	public final static String PLUGIN_GUID = "5379c471-be4e-4685-b197-d146728368a0";
 	public final static String PLUGIN_EXECNAME = "Bitwig Studio.exe";
+	
+	private CraftTool currentTool;
 
 	public Craft(ControllerHost host) {
 		// TODO Auto-generated constructor stub
@@ -45,16 +48,12 @@ public class Craft implements Observer {
 
 			@Override
 			public void valueChanged(boolean newValue) {
-				try {
-					commandHandler.toolChange(CraftTool.TRACK.name());
-				} catch (IOException e) {
-					host.println("Cannot Change the tool");
-				}
-
+					toolChange(CraftTool.TRACK);
 			}
 		});
 
 	}
+
 
 	public void ConnectionToCraftDevice() {
 		try {
@@ -96,5 +95,25 @@ public class Craft implements Observer {
 	public void sendMessagetoCraft(String JSONMessage) throws IOException {
 		craftWSClient.sendToDevice(JSONMessage);
 	}
+	
+	 public void toolChange(CraftTool context) throws IOException
+     {
+             ToolChangeObject toolChangeObject = new ToolChangeObject();
+             toolChangeObject.message_type = "tool_change";
+             toolChangeObject.session_id = commandHandler.getSessionId();
+             toolChangeObject.tool_id = context.name();
+             
+             currentTool = context;
 
+             sendMessagetoCraft(toolChangeObject.toJSON());
+     }
+
+	 public void selectNextTool()
+	 {
+		 try {
+			toolChange(currentTool.getNext());
+		} catch (IOException e) {
+			host.showPopupNotification("Cannot change Tool");
+		}
+	 }
 }
