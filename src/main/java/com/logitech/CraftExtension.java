@@ -2,7 +2,7 @@ package com.logitech;
 
 import com.bitwig.extension.controller.ControllerExtension;
 import com.bitwig.extension.controller.api.ControllerHost;
-import com.logitech.Device.Craft;
+import com.logitech.craft.Craft;
 
 public class CraftExtension extends ControllerExtension
 {

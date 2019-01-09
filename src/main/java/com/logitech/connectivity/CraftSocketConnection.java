@@ -3,20 +3,19 @@ package com.logitech.connectivity;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.net.URI;
 import java.util.Observable;
 
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketFrame;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.eclipse.jetty.websocket.api.extensions.Frame;
+import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import com.bitwig.extension.controller.api.ControllerHost;
-import com.google.gson.Gson;
-import com.logitech.CrownObject;
 
 @WebSocket
 public class CraftSocketConnection extends Observable{
@@ -27,34 +26,34 @@ public class CraftSocketConnection extends Observable{
 	
 	public final static String  CRAFT_IP = "127.0.0.1";
 	public final static int CRAFT_PORT = 10134;
-	public final static String PLUGIN_GUID ="5379c471-be4e-4685-b197-d146728368a0";
-	public final static String PLUGIN_EXECNAME = "Bitwig Studio.exe";
+	private final String connectionURL = "ws://localhost:10134";	
+	private WebSocketClient wsClient;
 	
 	
-	public String value;
 	
 	public ControllerHost host;
+	public String RegistrationRequest;
 	
-	public CraftSocketConnection(ControllerHost host) throws IOException
+	public CraftSocketConnection(ControllerHost host,String registrationRequest) throws Exception
 	{
 		this.host=host;
+		this.RegistrationRequest = registrationRequest;
+		openConnection();
+	}
+	
+	
+	public void openConnection() throws Exception {
+		wsClient = new WebSocketClient();
+		wsClient.start();
+		wsClient.connect(this,new URI(connectionURL),new ClientUpgradeRequest());
 	}
 	
 	@OnWebSocketConnect
 	public void initConnection(Session session) throws IOException
 	{
 		this.session =session;
-
-		CrownRegisterRootObject registerRequest=new CrownRegisterRootObject();
-		registerRequest.message_type = "register";
-		registerRequest.plugin_guid = PLUGIN_GUID;
-		registerRequest.execName = PLUGIN_EXECNAME;
-		registerRequest.PID = Integer.parseInt(ManagementFactory.getRuntimeMXBean().getName().split("@")[0]);
-		
-		String request = registerRequest.ToJson();
-		
-		session.getRemote().sendString(request);
-host.println("send connection Request: " + request);
+		sendToDevice(RegistrationRequest);
+host.println("send connection Request: " + RegistrationRequest);
 
 	}
 	
@@ -65,8 +64,7 @@ host.println("send connection Request: " + request);
 	@OnWebSocketMessage
 	public void onMessage(Session session,String message) {
 		setChanged();
-		CrownObject co = new Gson().fromJson(message,CrownObject.class);
-		notifyObservers(co);
+		notifyObservers(message);
 	}
 
 //@OnWebSocketFrame
@@ -77,14 +75,15 @@ host.println("send connection Request: " + request);
 //
 //}
 
-
+	public void sendToDevice(String jsonMessage) throws IOException {
+		session.getRemote().sendString(jsonMessage);
+	}
+	
 	@OnWebSocketError
     public void onError(Throwable t) {
         System.out.println("Error: " + t.getMessage());
         host.println(t.getMessage());
     }
-	public void SendMessageToCraft(String JsonMessage) {
-	}
 	
 	
 	@OnWebSocketClose

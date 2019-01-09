@@ -94,7 +94,7 @@
 						</goals>
 						<configuration>
 							<sourceFile>${project.build.directory}/${project.build.finalName}-jar-with-dependencies.jar</sourceFile>
-							<destinationFile>${project.build.directory}/Craft.bwextension</destinationFile>
+							<destinationFile>${user.home}/Documents/Bitwig Studio/extensions/Craft.bwextension</destinationFile>
 						</configuration>
 					</execution>
 				</executions>
