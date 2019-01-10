@@ -22,7 +22,7 @@ public class CommandHandler {
 		handlers.get(MessageTypes.CROWNTURNEVENT_MESSAGETYPE).addObserver((TouchEventHandler)handlers.get(MessageTypes.CROWNTOUCHEVENT_MESSAGETYPE));
 	}
 
-	public void execute(CrownRootObject co)
+	public void execute(CrownRootObject co) throws IllegalAccessException
 	{
 		Handler handler = getHandler(co);
 		if (handler!=null)
@@ -34,11 +34,11 @@ public class CommandHandler {
 		return handlers.get(co.getMessageType());
 	}
 	
-	public String getSessionId() throws IllegalAccessError{
+	public String getSessionId() throws IllegalAccessException{
 		String v = ((RegistrationHandler)handlers.get(MessageTypes.REGISTRATIONACK_MESSAGETYPE)).session_id;
 		if (v != null && !v.isEmpty())
 			return v;
-		throw new IllegalAccessError("No session ID has been registered");
+		throw new IllegalAccessException("No session ID has been registered");
 	}
 	
 	

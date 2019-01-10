@@ -13,7 +13,7 @@ public abstract class Handler extends Observable{
 		this.craft = craft;
 	}
 
-	public abstract void handle(CrownRootObject co);
+	public abstract void handle(CrownRootObject co) throws IllegalAccessException;
 
 	public abstract MessageTypes getMessageTypeHandler();
 

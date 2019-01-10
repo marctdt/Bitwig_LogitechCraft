@@ -9,22 +9,16 @@ public class TransportMode extends Mode{
 		super(ModeType.TRANSPORTMODE, craft);
 	}
 
-	@Override
-	public void initOptions() {
-		this.options.add("PositionOption");
-		this.options.add("tempoOption");
-		this.currentOption=options.get(0);
-	}
 
 	@Override
 	public void doAction(CrownRootObject co) {
 		
-		switch (currentOption) {
+		switch (co.task_options.current_tool_option) {
 		case "PositionOption":
-			craft.incTransportPosition((double) co.delta / 4);
+			craft.incTransportPosition( co.ratchet_delta);
 			break;
-		case "tempoOption":
-			craft.incTempo((double)co.delta/4);
+		case "TempoOption":
+			craft.incTempo((double)co.delta);
 			break;
 
 		default:

@@ -13,27 +13,21 @@ public class TrackMode extends Mode{
 	}
 
 	@Override
-	public void initOptions() {
-		this.addOption("TrackOption");
-		this.addOption("VolumeOption");
-		this.addOption("PanOption");
-		
-		this.currentOption = this.options.get(0);
-	}
-
-	@Override
 	public void doAction(CrownRootObject co) {
 		
-		switch (currentOption) {
+		switch (co.task_options.current_tool_option) {
 		case "TrackOption":
 			if(co.ratchet_delta>0)
 			craft.selectNextTrack();
-			else
+			else if(co.ratchet_delta < 0)
 				craft.selectPreviousTrack();
 			break;
 		case "VolumeOption":
 			craft.incVolumeCurrentTrack(co.delta);
 
+			break;
+		case "PanOption":
+			craft.incPanCurrentTrack(co.delta);
 			break;
 		default:
 			break;

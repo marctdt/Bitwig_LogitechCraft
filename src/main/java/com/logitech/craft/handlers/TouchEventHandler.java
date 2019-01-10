@@ -11,46 +11,27 @@ import com.logitech.craft.mode.Mode;
 
 public class TouchEventHandler extends Handler implements Observer {
 
-	private static long touchedTime;
 	private static Timer timerToSwitchToSelectToolMode;
 
 	private static TimerTask timerTaskToSwitchToSelectToolMode;
-	
+
 	public TouchEventHandler(Craft craft) {
 		super(craft);
-		timerToSwitchToSelectToolMode = new Timer();
-		timerTaskToSwitchToSelectToolMode = new TimerTask() {
-			
-			@Override
-			public void run() {
-				craft.setToolMode(true);
-			}
-		};
-		
+
 	}
 
 	@Override
-	public void handle(CrownRootObject co) {
-		double elapesedTime = (System.currentTimeMillis() - touchedTime);
+	public void handle(CrownRootObject co) throws IllegalAccessException {
 
-		if (co.touch_state == 1)
-		{
-			touchedTime = System.currentTimeMillis();
-			timerToSwitchToSelectToolMode.schedule(timerTaskToSwitchToSelectToolMode, 1500);
-		}
-		else if (co.touch_state == 0 && elapesedTime < 200)
-		{
-			craft.getCurrentMode().nextOption();
+		if (co.touch_state == 1) {
+			activateTimer();
 		}
 
-		
-		
-		if(co.touch_state == 0)
-		{
+		if (co.touch_state == 0) {
 			deactivateTimer();
 			craft.setToolMode(false);
 //			craft.setCurrentMode(craft.getSelectedToolMode());
-			craft.switchTool(craft.getCurrentMode().getModeType().name());
+//			craft.switchTool(craft.getCurrentMode().getModeType().name());
 
 		}
 	}
@@ -60,16 +41,32 @@ public class TouchEventHandler extends Handler implements Observer {
 		return MessageTypes.CROWNTOUCHEVENT_MESSAGETYPE;
 	}
 
-	private void deactivateTimer()
-	{
-		timerTaskToSwitchToSelectToolMode.cancel();
-		timerToSwitchToSelectToolMode.cancel();	
+	private void activateTimer() {
+
+		timerToSwitchToSelectToolMode = new Timer();
+		timerTaskToSwitchToSelectToolMode = new TimerTask() {
+
+			@Override
+			public void run() {
+				craft.setToolMode(true);
+			}
+		};
+		timerToSwitchToSelectToolMode.schedule(timerTaskToSwitchToSelectToolMode, 800);
 	}
-	
+
+	private void deactivateTimer() {
+		if (timerTaskToSwitchToSelectToolMode != null || timerToSwitchToSelectToolMode != null) {
+			timerTaskToSwitchToSelectToolMode.cancel();
+			timerToSwitchToSelectToolMode.cancel();
+		}
+		timerTaskToSwitchToSelectToolMode = null;
+		timerToSwitchToSelectToolMode = null;
+	}
+
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		
+
 		deactivateTimer();
 	}
-	
+
 }

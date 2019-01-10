@@ -24,6 +24,7 @@ import com.logitech.craft.mode.Mode;
 import com.logitech.craft.mode.Mode.ModeType;
 import com.logitech.craft.mode.ToolMode;
 import com.logitech.craft.mode.TrackMode;
+import com.logitech.craft.mode.TransportMode;
 
 public class Craft implements Observer {
 
@@ -39,6 +40,7 @@ public class Craft implements Observer {
 	public final static String PLUGIN_EXECNAME = "Bitwig Studio.exe";
 
 	private Map<Mode.ModeType, Mode> modes;
+	private ToolMode toolMode;
 
 	public Craft(ControllerHost host) {
 		this.host = host;
@@ -46,11 +48,15 @@ public class Craft implements Observer {
 		commandHandler = new CommandHandler(this);
 
 		modes = new HashMap<Mode.ModeType, Mode>();
-		modes.put(Mode.ModeType.TOOLMODE, new ToolMode(this));
 		modes.put(ModeType.TRACKMODE, new TrackMode(this));
+		modes.put(Mode.ModeType.TRANSPORTMODE, new TransportMode(this));
+		toolMode = new ToolMode(this);
 		initViews();
 	}
 
+	public ToolMode getToolMode() {
+		return toolMode;
+	}
 	public void initViews() {
 
 		transport = host.createTransport();
@@ -77,8 +83,11 @@ public class Craft implements Observer {
 
 			@Override
 			public void valueChanged(double newValue) {
-				ReportToolOptionDataValueChange(ModeType.TRANSPORTMODE, ModeType.TRANSPORTMODE.name(),
-						transport.getPosition().getFormatted());
+				try {
+					ReportToolOptionDataValueChange(ModeType.TRANSPORTMODE, ModeType.TRANSPORTMODE.name(),
+							transport.getPosition().getFormatted());
+				} catch (IllegalAccessException | IOException e) {
+				}
 
 			}
 		});
@@ -114,7 +123,12 @@ public class Craft implements Observer {
 		CrownRootObject co = new Gson().fromJson(message.toString(), CrownRootObject.class);
 		host.println("execute: " + co.message_type);
 
-		commandHandler.execute(co);
+		try {
+			commandHandler.execute(co);
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			host.println("Couldn't execute the task");
+		}
 	}
 
 	public CraftSocketConnection getCraftWSCLient() {
@@ -125,9 +139,10 @@ public class Craft implements Observer {
 		craftWSClient.sendToDevice(JSONMessage);
 	}
 
-	public void incTransportPosition(double value) {
+	public void incTransportPosition(int value) {
 
-		transport.incPosition(value, false);
+//		transport.incPosition(calculateCenteredValue(value)*256, true);
+		transport.incPosition(value, true);
 
 	}
 
@@ -148,30 +163,24 @@ public class Craft implements Observer {
 		cursor.selectPrevious();
 	}
 
-	public void ReportToolOptionDataValueChange(Mode.ModeType tool, String toolOption, String value) {
-		ToolUpdateRootObject toolUpdateRootObject = new ToolUpdateRootObject();
-		toolUpdateRootObject.tool_id = tool.name();
-		toolUpdateRootObject.message_type = "tool_update";
-		toolUpdateRootObject.session_id = commandHandler.getSessionId();
-		toolUpdateRootObject.show_overlay = "true";
-		toolUpdateRootObject.tool_options = new ArrayList<ToolOption>();
-		ToolOption tool_option = new ToolOption();
-		tool_option.name = toolOption;
-		tool_option.value = value;
-		toolUpdateRootObject.tool_options.add(tool_option);
+	public void ReportToolOptionDataValueChange(Mode.ModeType tool, String toolOption, String value) throws IOException, IllegalAccessException{
+			ToolUpdateRootObject toolUpdateRootObject = new ToolUpdateRootObject();
+			toolUpdateRootObject.tool_id = tool.name();
+			toolUpdateRootObject.message_type = "tool_update";
+			toolUpdateRootObject.session_id = commandHandler.getSessionId();
+			toolUpdateRootObject.show_overlay = "true";
+			toolUpdateRootObject.tool_options = new ArrayList<ToolOption>();
+			ToolOption tool_option = new ToolOption();
+			tool_option.name = toolOption;
+			tool_option.value = value;
+			toolUpdateRootObject.tool_options.add(tool_option);
 
-		try {
 			craftWSClient.sendToDevice(toolUpdateRootObject.toJSON());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		host.println("MyWebSocket.ReportToolOptionDataValueChange - Tool:" + tool.toString() + ", Tool option:"
-				+ toolOption + ", Value:" + value);
+			host.println("MyWebSocket.ReportToolOptionDataValueChange - Tool:" + tool.toString() + ", Tool option:"
+					+ toolOption + ", Value:" + value);
 	}
 
-	public String getSessionId() {
+	public String getSessionId() throws IllegalAccessException {
 		return commandHandler.getSessionId();
 	}
 
@@ -183,14 +192,6 @@ public class Craft implements Observer {
 		return modes.get(mode);
 	}
 
-	public Mode getCurrentMode() {
-		if (isToolModeEnabled)
-			return getMode(ModeType.TOOLMODE);
-
-		ToolMode toolmode = (ToolMode) modes.get(ModeType.TOOLMODE);
-		ModeType selectedMode = toolmode.getSelectedMode();
-		return getMode(selectedMode);
-	}
 
 	private boolean isToolModeEnabled;
 
@@ -198,7 +199,12 @@ public class Craft implements Observer {
 		isToolModeEnabled = enable;
 	}
 
-	public void switchTool(String option) {
+	public boolean isToolModeEnabled()
+	{
+		return isToolModeEnabled;
+	}
+
+	public void switchTool(String option) throws IllegalAccessException {
 		ToolChangeObject toolChangeObject = new ToolChangeObject();
 		toolChangeObject.message_type = "tool_change";
 		toolChangeObject.session_id = getSessionId();
@@ -212,17 +218,32 @@ public class Craft implements Observer {
 	}
 
 	public void incTempo(double d) {
-		transport.tempo().inc(d);
+		transport.tempo().inc(calculateCenteredValue(d));
 	}
 
 	public void initCraft() {
 
-		
+		try {
+			switchTool(ModeType.TRACKMODE.name());
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void incVolumeCurrentTrack(double delta) {
+
+		cursor.volume().inc(calculateCenteredValue(delta));
+	}
+	public void incPanCurrentTrack(double delta) {
+		cursor.pan().inc(calculateCenteredValue(delta));
 		
-		cursor.volume().inc(delta);
+	}
+	
+	public double calculateCenteredValue(double delta) {
+		if(delta<0)
+			return -calculateCenteredValue(-delta);
+		return 1-(1/(delta/1024+1));
 	}
 
 }
