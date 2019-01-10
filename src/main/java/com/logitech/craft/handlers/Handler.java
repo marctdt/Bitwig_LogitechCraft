@@ -1,11 +1,18 @@
 package com.logitech.craft.handlers;
 
+import com.logitech.craft.Craft;
 import com.logitech.craft.dataobjects.CrownRootObject;
 
-public interface Handler {
+public abstract class Handler {
 
+	public Craft craft;
+	
+	public Handler(Craft craft) {
+		this.craft = craft;
+	}
 
-	public void handle(CrownRootObject co);
-	public MessageTypes getMessageTypeHandler(); 
+	public abstract void handle(CrownRootObject co);
+
+	public abstract MessageTypes getMessageTypeHandler();
 
 }

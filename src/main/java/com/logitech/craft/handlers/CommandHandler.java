@@ -1,13 +1,10 @@
 package com.logitech.craft.handlers;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gson.Gson;
 import com.logitech.craft.Craft;
 import com.logitech.craft.dataobjects.CrownRootObject;
-import com.logitech.craft.dataobjects.ToolChangeObject;
 
 public class CommandHandler {
 	
@@ -16,14 +13,18 @@ public class CommandHandler {
 	
 	public CommandHandler(Craft craft) {
 
-		handlers = new HashMap<MessageTypes, Handler>();
-		handlers.put(MessageTypes.REGISTRATIONACK_MESSAGETYPE, new HandleRegistration());
 		this.craft =craft;
+		handlers = new HashMap<MessageTypes, Handler>();
+		handlers.put(MessageTypes.REGISTRATIONACK_MESSAGETYPE, new RegistrationHandler(craft));
+		handlers.put(MessageTypes.CROWNTOUCHEVENT_MESSAGETYPE, new TouchEventHandler(craft));
+		handlers.put(MessageTypes.CROWNTURNEVENT_MESSAGETYPE, new TurnEventHandler(craft));
 	}
 
 	public void execute(CrownRootObject co)
 	{
-		getHandler(co).handle(co);
+		Handler handler = getHandler(co);
+		if (handler!=null)
+			handler.handle(co);
 	}
 	
 	private Handler getHandler(CrownRootObject co)
@@ -31,9 +32,9 @@ public class CommandHandler {
 		return handlers.get(co.getMessageType());
 	}
 	
-	public String getSessionId() {
-		String v = ((HandleRegistration)handlers.get(MessageTypes.REGISTRATIONACK_MESSAGETYPE)).session_id;
-		if (!v.isEmpty())
+	public String getSessionId() throws IllegalAccessError{
+		String v = ((RegistrationHandler)handlers.get(MessageTypes.REGISTRATIONACK_MESSAGETYPE)).session_id;
+		if (v != null && !v.isEmpty())
 			return v;
 		throw new IllegalAccessError("No session ID has been registered");
 	}

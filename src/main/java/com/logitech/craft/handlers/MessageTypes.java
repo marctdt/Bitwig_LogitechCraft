@@ -23,21 +23,21 @@ public enum MessageTypes {
 	@Override
 	public String toString() {
 		return text;
-	}
+} 
 	
 	
 	
-	private static final Map<String, MessageTypes> nameToValueMap =
+	private static final Map<String, MessageTypes> nameToTextMap =
 	        new HashMap<String, MessageTypes>();
 
 	    static {
 	        for (MessageTypes value : EnumSet.allOf(MessageTypes.class)) {
-	            nameToValueMap.put(value.name(), value);
+	            nameToTextMap.put(value.text, value);
 	        }
 	    }
 
-	    public static MessageTypes forName(String name) {
-	        return nameToValueMap.get(name);
+	    public static MessageTypes forText(String text) {
+	        return nameToTextMap.get(text);
 	    }
 	
 }

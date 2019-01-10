@@ -9,7 +9,10 @@ public abstract class DataObject {
 	
 	public MessageTypes getMessageType()
 	{
-		return MessageTypes.forName(message_type);
+		MessageTypes mt = MessageTypes.forText(message_type);
+		if (mt != null)
+			return mt;
+		throw new NullPointerException("Cannot find the handler");
 	}
 	
 	public String toJSON() {

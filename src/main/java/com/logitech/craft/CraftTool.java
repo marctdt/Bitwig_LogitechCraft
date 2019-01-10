@@ -30,6 +30,7 @@ public enum CraftTool {
 	    
 	    public CraftTool getNext()
 	    {
+	    	
 	    	return nameToValueMap.get((this.ordinal() + 1 ) % getLength());
 	    }
 	
