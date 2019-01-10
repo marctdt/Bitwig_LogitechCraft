@@ -1,2 +1,2 @@
 # Bitwig_LogitechCraft
-Controller for Logitech Craft in Bitwig
+Logitech Craft Controller for Bitwig
