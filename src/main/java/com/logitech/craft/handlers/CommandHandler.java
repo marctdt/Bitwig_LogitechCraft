@@ -18,6 +18,8 @@ public class CommandHandler {
 		handlers.put(MessageTypes.REGISTRATIONACK_MESSAGETYPE, new RegistrationHandler(craft));
 		handlers.put(MessageTypes.CROWNTOUCHEVENT_MESSAGETYPE, new TouchEventHandler(craft));
 		handlers.put(MessageTypes.CROWNTURNEVENT_MESSAGETYPE, new TurnEventHandler(craft));
+		
+		handlers.get(MessageTypes.CROWNTURNEVENT_MESSAGETYPE).addObserver((TouchEventHandler)handlers.get(MessageTypes.CROWNTOUCHEVENT_MESSAGETYPE));
 	}
 
 	public void execute(CrownRootObject co)

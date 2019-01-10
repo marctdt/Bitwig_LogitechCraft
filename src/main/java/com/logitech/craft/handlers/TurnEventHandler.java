@@ -1,10 +1,11 @@
 package com.logitech.craft.handlers;
 
 import com.logitech.craft.Craft;
-import com.logitech.craft.CraftTool;
 import com.logitech.craft.dataobjects.CrownRootObject;
+import com.logitech.craft.mode.Mode;
+import com.logitech.craft.mode.ToolMode;
 
-public class TurnEventHandler extends Handler {
+public class TurnEventHandler extends Handler{
 
 	public TurnEventHandler(Craft craft) {
 		super(craft);
@@ -13,28 +14,11 @@ public class TurnEventHandler extends Handler {
 
 	@Override
 	public void handle(CrownRootObject co) {
-
-		craft.setIsChangingToolMode(false);
-		switch (craft.getCurrentTool()) {
-		case TRACK:
-			if (co.ratchet_delta > 0)
-				craft.selectNextTrack();
-			else
-				craft.selectPreviousTrack();
-
-			break;
-		case TRANSPORT:
-			craft.incTransportPosition((double) co.delta / 4);
-			break;
-
-		default:
-			break;
-		}
-
-//		if(co.delta>0)
-//			craft.transportForward();
-//		else
-//			craft.transportrewind();
+		setChanged();
+		this.notifyObservers();
+		
+		Mode selectedMode = craft.getCurrentMode();
+		selectedMode.doAction(co);
 	}
 
 	@Override

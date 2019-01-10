@@ -1,9 +1,11 @@
 package com.logitech.craft.handlers;
 
+import java.util.Observable;
+
 import com.logitech.craft.Craft;
 import com.logitech.craft.dataobjects.CrownRootObject;
 
-public abstract class Handler {
+public abstract class Handler extends Observable{
 
 	public Craft craft;
 	
