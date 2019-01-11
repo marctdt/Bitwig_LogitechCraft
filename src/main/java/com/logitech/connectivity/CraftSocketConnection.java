@@ -37,7 +37,7 @@ public class CraftSocketConnection extends Observable {
 		openConnection();
 	}
 
-	public void openConnection() throws Exception {
+	public void openConnection() throws Exception  {
 		wsClient = new WebSocketClient();
 		wsClient.start();
 		wsClient.connect(this, new URI(connectionURL), new ClientUpgradeRequest());
@@ -58,7 +58,7 @@ public class CraftSocketConnection extends Observable {
 	@OnWebSocketMessage
 	public void onMessage(Session session, String message) {
 		setChanged();
-		host.println(message);
+//		host.println(message);
 		notifyObservers(message);
 
 	}
@@ -82,8 +82,9 @@ public class CraftSocketConnection extends Observable {
 	}
 
 	@OnWebSocketClose
-	public void onClose(int statusCode, String reason) {
+	public void onClose(int statusCode, String reason) throws Exception {
 		System.out.printf("onClose(%d, %s)%n", statusCode, reason);
 		host.println("onClose() " + statusCode + "," + reason);
+		openConnection();
 	}
 }

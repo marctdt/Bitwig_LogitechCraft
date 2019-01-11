@@ -17,7 +17,7 @@ public class CraftExtension extends ControllerExtension
       final ControllerHost host = getHost();      
       // TODO: Perform your driver initialization here.
       // For now just show a popup notification for verification that it is running.
-      host.showPopupNotification("Craft Initialized");
+//      host.showPopupNotification("Craft Initialized");
     
       Craft device=new Craft(host);
       device.ConnectionToCraftDevice();
