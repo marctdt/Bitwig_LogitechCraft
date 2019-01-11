@@ -14,6 +14,7 @@ public abstract class Mode {
 		TRACKMODE, TRANSPORTMODE
 		//, DEVICEMODE //remove it as not functionnal
 		,BROWSERMODE
+		,TEMPOMODE
 	}
 	
 
