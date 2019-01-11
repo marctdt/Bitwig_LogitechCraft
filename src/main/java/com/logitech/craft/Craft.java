@@ -29,6 +29,7 @@ import com.logitech.craft.mode.BrowserMode;
 import com.logitech.craft.mode.DeviceMode;
 import com.logitech.craft.mode.Mode;
 import com.logitech.craft.mode.Mode.ModeType;
+import com.logitech.craft.mode.TempoMode;
 import com.logitech.craft.mode.ToolMode;
 import com.logitech.craft.mode.TrackMode;
 import com.logitech.craft.mode.TransportMode;
@@ -62,6 +63,7 @@ public class Craft implements Observer {
 		modes.put(Mode.ModeType.TRANSPORTMODE, new TransportMode(this));
 		// modes.put(ModeType.DEVICEMODE, new DeviceMode(this));
 		modes.put(ModeType.BROWSERMODE, new BrowserMode(this));
+		modes.put(ModeType.TEMPOMODE, new TempoMode(this));
 		toolMode = new ToolMode(this);
 		initViews();
 	}
