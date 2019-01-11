@@ -9,8 +9,13 @@ import java.util.Observable;
 import java.util.Observer;
 
 import com.bitwig.extension.callback.DoubleValueChangedCallback;
+import com.bitwig.extension.controller.api.Browser;
 import com.bitwig.extension.controller.api.ControllerHost;
+import com.bitwig.extension.controller.api.CursorDevice;
 import com.bitwig.extension.controller.api.CursorTrack;
+import com.bitwig.extension.controller.api.DeviceBank;
+import com.bitwig.extension.controller.api.PinnableCursorDevice;
+import com.bitwig.extension.controller.api.PopupBrowser;
 import com.bitwig.extension.controller.api.Transport;
 import com.google.gson.Gson;
 import com.logitech.connectivity.CraftSocketConnection;
@@ -20,6 +25,8 @@ import com.logitech.craft.dataobjects.ToolChangeObject;
 import com.logitech.craft.dataobjects.ToolOption;
 import com.logitech.craft.dataobjects.ToolUpdateRootObject;
 import com.logitech.craft.handlers.CommandHandler;
+import com.logitech.craft.mode.BrowserMode;
+import com.logitech.craft.mode.DeviceMode;
 import com.logitech.craft.mode.Mode;
 import com.logitech.craft.mode.Mode.ModeType;
 import com.logitech.craft.mode.ToolMode;
@@ -31,8 +38,11 @@ public class Craft implements Observer {
 	private ControllerHost host;
 	private CraftSocketConnection craftWSClient;
 
-	private CursorTrack cursor;
+	private CursorTrack cursorTrack;
 	private Transport transport;
+	private PinnableCursorDevice cursorDevice;
+//	private DeviceBank deviceBank;
+	private PopupBrowser deviceBrowser;
 
 	private CommandHandler commandHandler;
 
@@ -50,6 +60,8 @@ public class Craft implements Observer {
 		modes = new HashMap<Mode.ModeType, Mode>();
 		modes.put(ModeType.TRACKMODE, new TrackMode(this));
 		modes.put(Mode.ModeType.TRANSPORTMODE, new TransportMode(this));
+		// modes.put(ModeType.DEVICEMODE, new DeviceMode(this));
+		modes.put(ModeType.BROWSERMODE, new BrowserMode(this));
 		toolMode = new ToolMode(this);
 		initViews();
 	}
@@ -57,11 +69,18 @@ public class Craft implements Observer {
 	public ToolMode getToolMode() {
 		return toolMode;
 	}
+
 	public void initViews() {
 
 		transport = host.createTransport();
 
-		cursor = host.createCursorTrack(0, 0);
+		cursorTrack = host.createCursorTrack(0, 0);
+
+		cursorDevice = cursorTrack.createCursorDevice();
+
+//		deviceBank = cursorTrack.createDeviceBank(0);
+
+		deviceBrowser = host.createPopupBrowser();
 
 //		cursor.addIsSelectedInEditorObserver(new BooleanValueChangedCallback() {
 //			@Override
@@ -154,30 +173,32 @@ public class Craft implements Observer {
 		transport.rewind();
 	}
 
-	public void selectNextTrack() {
-		cursor.selectNext();
+	public void selectNextTrack(int repeatTime) {
+		for (int i = 0; i < Math.abs(repeatTime); i++)
+			cursorTrack.selectNext();
 	}
 
-	public void selectPreviousTrack() {
-
-		cursor.selectPrevious();
+	public void selectPreviousTrack(int repeatTime) {
+		for (int i = 0; i < Math.abs(repeatTime); i++)
+			cursorTrack.selectPrevious();
 	}
 
-	public void ReportToolOptionDataValueChange(Mode.ModeType tool, String toolOption, String value) throws IOException, IllegalAccessException{
-			ToolUpdateRootObject toolUpdateRootObject = new ToolUpdateRootObject();
-			toolUpdateRootObject.tool_id = tool.name();
-			toolUpdateRootObject.message_type = "tool_update";
-			toolUpdateRootObject.session_id = commandHandler.getSessionId();
-			toolUpdateRootObject.show_overlay = "true";
-			toolUpdateRootObject.tool_options = new ArrayList<ToolOption>();
-			ToolOption tool_option = new ToolOption();
-			tool_option.name = toolOption;
-			tool_option.value = value;
-			toolUpdateRootObject.tool_options.add(tool_option);
+	public void ReportToolOptionDataValueChange(Mode.ModeType tool, String toolOption, String value)
+			throws IOException, IllegalAccessException {
+		ToolUpdateRootObject toolUpdateRootObject = new ToolUpdateRootObject();
+		toolUpdateRootObject.tool_id = tool.name();
+		toolUpdateRootObject.message_type = "tool_update";
+		toolUpdateRootObject.session_id = commandHandler.getSessionId();
+		toolUpdateRootObject.show_overlay = "true";
+		toolUpdateRootObject.tool_options = new ArrayList<ToolOption>();
+		ToolOption tool_option = new ToolOption();
+		tool_option.name = toolOption;
+		tool_option.value = value;
+		toolUpdateRootObject.tool_options.add(tool_option);
 
-			craftWSClient.sendToDevice(toolUpdateRootObject.toJSON());
-			host.println("MyWebSocket.ReportToolOptionDataValueChange - Tool:" + tool.toString() + ", Tool option:"
-					+ toolOption + ", Value:" + value);
+		craftWSClient.sendToDevice(toolUpdateRootObject.toJSON());
+		host.println("MyWebSocket.ReportToolOptionDataValueChange - Tool:" + tool.toString() + ", Tool option:"
+				+ toolOption + ", Value:" + value);
 	}
 
 	public String getSessionId() throws IllegalAccessException {
@@ -192,15 +213,13 @@ public class Craft implements Observer {
 		return modes.get(mode);
 	}
 
-
 	private boolean isToolModeEnabled;
 
 	public void setToolMode(boolean enable) {
 		isToolModeEnabled = enable;
 	}
 
-	public boolean isToolModeEnabled()
-	{
+	public boolean isToolModeEnabled() {
 		return isToolModeEnabled;
 	}
 
@@ -233,17 +252,69 @@ public class Craft implements Observer {
 
 	public void incVolumeCurrentTrack(double delta) {
 
-		cursor.volume().inc(calculateCenteredValue(delta));
-	}
-	public void incPanCurrentTrack(double delta) {
-		cursor.pan().inc(calculateCenteredValue(delta));
-		
-	}
-	
-	public double calculateCenteredValue(double delta) {
-		if(delta<0)
-			return -calculateCenteredValue(-delta);
-		return 1-(1/(delta/1024+1));
+		cursorTrack.volume().inc(calculateCenteredValue(delta));
 	}
 
+	public void incPanCurrentTrack(double delta) {
+		cursorTrack.pan().inc(calculateCenteredValue(delta));
+
+	}
+
+	public double calculateCenteredValue(double delta) {
+		if (delta < 0)
+			return -calculateCenteredValue(-delta);
+		return 1 - (1 / (delta / 1024 + 1));
+	}
+
+	public void selectNextDevice(int repeatTime) {
+		for (int i = 0; i < Math.abs(repeatTime); i++)
+			cursorDevice.selectNext();
+	}
+
+	public void selectPreviousDevice(int repeatTime) {
+		for (int i = 0; i < Math.abs(repeatTime); i++)
+			cursorDevice.selectPrevious();
+	}
+
+	public void incSelectedDeviceParametr(int delta) {
+
+		cursorTrack.createDeviceBank(0).getDevice(0).createCursorRemoteControlsPage(2).getParameter(0)
+				.inc(calculateCenteredValue(delta));
+	}
+
+	public void selectNextDeviceParameterBank(int repeatTime) {
+		for (int i = 0; i < Math.abs(repeatTime); i++)
+			cursorDevice.nextParameterPage();
+
+	}
+
+	public void selectPreviousDeviceParameterBank(int repeatTime) {
+		for (int i = 0; i < Math.abs(repeatTime); i++)
+			cursorDevice.previousParameterPage();
+	}
+
+	public void selectNextDeviceParameter(int repeatTime) {
+		for (int i = 0; i < Math.abs(repeatTime); i++)
+			cursorTrack.createDeviceBank(0).getDevice(0).createCursorRemoteControlsPage(0).selectNext();
+	}
+
+	public void selectPreviousDeviceParameter(int repeatTime) {
+
+		for (int i = 0; i < Math.abs(repeatTime); i++)
+			cursorTrack.createDeviceBank(0).getDevice(0).createCursorRemoteControlsPage(0).selectPrevious();
+	}
+
+	public void selectNextDeviceInBrowser(int repeatTime) {
+
+		for (int i = 0; i < Math.abs(repeatTime); i++)
+			deviceBrowser.selectNextFile();
+
+	}
+
+	public void selectPreviousDeviceInBrowser(int repeatTime) {
+		for (int i = 0; i < Math.abs(repeatTime); i++) {
+			deviceBrowser.selectPreviousFile();
+		}
+
+	}
 }

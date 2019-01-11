@@ -18,9 +18,9 @@ public class TrackMode extends Mode{
 		switch (co.task_options.current_tool_option) {
 		case "TrackOption":
 			if(co.ratchet_delta>0)
-			craft.selectNextTrack();
+			craft.selectNextTrack(co.ratchet_delta);
 			else if(co.ratchet_delta < 0)
-				craft.selectPreviousTrack();
+				craft.selectPreviousTrack(co.ratchet_delta);
 			break;
 		case "VolumeOption":
 			craft.incVolumeCurrentTrack(co.delta);
