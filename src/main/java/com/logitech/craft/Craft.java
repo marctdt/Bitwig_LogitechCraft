@@ -100,18 +100,18 @@ public class Craft implements Observer {
 //			}
 //		});
 
-		transport.getPosition().addValueObserver(new DoubleValueChangedCallback() {
-
-			@Override
-			public void valueChanged(double newValue) {
-				try {
-					ReportToolOptionDataValueChange(ModeType.TRANSPORTMODE, ModeType.TRANSPORTMODE.name(),
-							transport.getPosition().getFormatted());
-				} catch (IllegalAccessException | IOException e) {
-				}
-
-			}
-		});
+//		transport.getPosition().addValueObserver(new DoubleValueChangedCallback() {
+//
+//			@Override
+//			public void valueChanged(double newValue) {
+//				try {
+//					ReportToolOptionDataValueChange(ModeType.TRANSPORTMODE, ModeType.TRANSPORTMODE.name(),
+//							transport.getPosition().getFormatted());
+//				} catch (IllegalAccessException | IOException e) {
+//				}
+//
+//			}
+//		});
 
 	}
 
