@@ -1,0 +1,92 @@
+{
+  "LocalizedStrings": [
+    {
+      "ID": "TOOLMODE",
+      "value": "Tool"
+    },
+    {
+      "ID": "TrackOption",
+      "value": "Track"
+    },
+    {
+      "ID": "TransportOption",
+      "value": "volume"
+    },
+    {
+      "ID": "TRACKMODE",
+      "value": "Track"
+    },
+    {
+      "ID": "TrackOption",
+      "value": "Track"
+    },
+    {
+      "ID": "VolumeOption",
+      "value": "Volume"
+    },
+    {
+      "ID": "PanOption",
+      "value": "PAN"
+    },
+    {
+      "ID": "TRANSPORTMODE",
+      "value": "Transport"
+    },
+    {
+      "ID": "PositionOption",
+      "value": "Position"
+    },
+    {
+      "ID": "TempoOption",
+      "value": "Tempo"
+    },
+    {
+      "ID": "DEVICEMODE",
+      "value": "Device"
+    },
+    {
+      "ID": "DeviceOption",
+      "value": "Device"
+    },
+    {
+      "ID": "DeviceParameterOption",
+      "value": "Select Parameter"
+    },
+    {
+      "ID": "DeviceBankOption",
+      "value": "Select Bank Page"
+    },
+    {
+      "ID": "ParameterOption",
+      "value": "Paremeter"
+    },
+    {
+      "ID": "BROWSERMODE",
+      "value": "Browser"
+    },
+    {
+      "ID": "SelectInBrowserOption",
+      "value": "Select Device"
+    },
+    {
+      "ID": "TEMPOMODE",
+      "value": "Tempo"
+    },
+    {
+      "ID": "moveVertical",
+      "value": "Position Y"
+    },
+    {
+      "ID": "keystrokeassignment",
+      "value": "Keystroke assignment"
+    },
+    {
+      "ID": "tint",
+      "value": "Tint"
+    },
+    {
+      "ID": "playpause",
+      "value": "Play/Pause"
+    }
+  ]
+}
