@@ -9,9 +9,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import com.bitwig.extension.callback.DoubleValueChangedCallback;
-import com.bitwig.extension.controller.api.Browser;
 import com.bitwig.extension.controller.api.ControllerHost;
-import com.bitwig.extension.controller.api.CursorDevice;
+import com.bitwig.extension.controller.api.CursorRemoteControlsPage;
 import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.DeviceBank;
 import com.bitwig.extension.controller.api.PinnableCursorDevice;
@@ -26,7 +25,6 @@ import com.logitech.craft.dataobjects.ToolOption;
 import com.logitech.craft.dataobjects.ToolUpdateRootObject;
 import com.logitech.craft.handlers.CommandHandler;
 import com.logitech.craft.mode.BrowserMode;
-import com.logitech.craft.mode.DeviceMode;
 import com.logitech.craft.mode.Mode;
 import com.logitech.craft.mode.Mode.ModeType;
 import com.logitech.craft.mode.TempoMode;
@@ -44,6 +42,8 @@ public class Craft implements Observer {
 	private PinnableCursorDevice cursorDevice;
 //	private DeviceBank deviceBank;
 	private PopupBrowser deviceBrowser;
+	private CursorRemoteControlsPage cursorRemoteControlsPage;
+	private DeviceBank deviceBank;
 
 	private CommandHandler commandHandler;
 
@@ -52,6 +52,8 @@ public class Craft implements Observer {
 
 	private Map<Mode.ModeType, Mode> modes;
 	private ToolMode toolMode;
+
+	private Mode currentMode;
 
 	public Craft(ControllerHost host) {
 		this.host = host;
@@ -65,6 +67,7 @@ public class Craft implements Observer {
 		modes.put(ModeType.BROWSERMODE, new BrowserMode(this));
 		modes.put(ModeType.TEMPOMODE, new TempoMode(this));
 		toolMode = new ToolMode(this);
+		currentMode = getMode(ModeType.TRACKMODE);
 		initViews();
 	}
 
@@ -83,6 +86,18 @@ public class Craft implements Observer {
 //		deviceBank = cursorTrack.createDeviceBank(0);
 
 		deviceBrowser = host.createPopupBrowser();
+
+		deviceBank = cursorDevice.getCursorSlot().createDeviceBank(1);
+		cursorRemoteControlsPage = deviceBank.getDevice(0).createCursorRemoteControlsPage(2);
+//		;
+//		cursorRemoteControlsPage.getParameter(0).value().addValueObserver(new DoubleValueChangedCallback() {
+//			
+//			@Override
+//			public void valueChanged(double newValue) {
+//				
+//				host.showPopupNotification(Double.toString(newValue));
+//			}
+//		});
 
 //		cursor.addIsSelectedInEditorObserver(new BooleanValueChangedCallback() {
 //			@Override
@@ -142,7 +157,7 @@ public class Craft implements Observer {
 	public void update(Observable arg0, Object message) {
 		// TODO Auto-generated method stub
 		CrownRootObject co = new Gson().fromJson(message.toString(), CrownRootObject.class);
-		host.println("execute: " + co.message_type);
+//		host.println("execute: " + co.message_type);
 
 		try {
 			commandHandler.execute(co);
@@ -163,8 +178,12 @@ public class Craft implements Observer {
 	public void incTransportPosition(int value) {
 
 //		transport.incPosition(calculateCenteredValue(value)*256, true);
-		transport.incPosition(value, true);
-
+//		transport.incPosition(value, true);
+		for (int i = 0; i < Math.abs(value); i++)
+			if (value > 0)
+				transport.fastForward();
+			else if (value < 0)
+				transport.rewind();
 	}
 
 	public void transportForward() {
@@ -199,8 +218,8 @@ public class Craft implements Observer {
 		toolUpdateRootObject.tool_options.add(tool_option);
 
 		craftWSClient.sendToDevice(toolUpdateRootObject.toJSON());
-		host.println("MyWebSocket.ReportToolOptionDataValueChange - Tool:" + tool.toString() + ", Tool option:"
-				+ toolOption + ", Value:" + value);
+//		host.println("MyWebSocket.ReportToolOptionDataValueChange - Tool:" + tool.toString() + ", Tool option:"
+//				+ toolOption + ", Value:" + value);
 	}
 
 	public String getSessionId() throws IllegalAccessException {
@@ -219,6 +238,8 @@ public class Craft implements Observer {
 
 	public void setToolMode(boolean enable) {
 		isToolModeEnabled = enable;
+		if (enable)
+			host.showPopupNotification("Switching Tool");
 	}
 
 	public boolean isToolModeEnabled() {
@@ -230,6 +251,7 @@ public class Craft implements Observer {
 		toolChangeObject.message_type = "tool_change";
 		toolChangeObject.session_id = getSessionId();
 		toolChangeObject.tool_id = option;
+		currentMode = getMode(ModeType.valueOf(option));
 		try {
 			sendMessagetoCraft(toolChangeObject.toJSON());
 		} catch (IOException e) {
@@ -238,8 +260,16 @@ public class Craft implements Observer {
 		}
 	}
 
+	public Mode getCurrentMode() {
+		return currentMode;
+	}
+
 	public void incTempo(double d) {
 		transport.tempo().inc(calculateCenteredValue(d));
+	}
+
+	public void tapTempo() {
+		transport.tapTempo();
 	}
 
 	public void initCraft() {

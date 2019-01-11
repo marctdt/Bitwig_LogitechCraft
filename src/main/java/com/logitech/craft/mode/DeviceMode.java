@@ -2,6 +2,7 @@ package com.logitech.craft.mode;
 
 import com.logitech.craft.Craft;
 import com.logitech.craft.dataobjects.CrownRootObject;
+import com.logitech.craft.handlers.TurnEventHandler;
 
 public class DeviceMode extends Mode {
 
@@ -14,6 +15,7 @@ public class DeviceMode extends Mode {
 	@Override
 	public void doAction(CrownRootObject co) throws IllegalAccessException {
 
+		if (co.message_type.equals(TurnEventHandler.TurnEventMessageType))
 		switch (co.task_options.current_tool_option) {
 		case "DeviceOption":
 

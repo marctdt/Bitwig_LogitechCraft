@@ -8,9 +8,12 @@ import java.util.TimerTask;
 import com.logitech.craft.Craft;
 import com.logitech.craft.dataobjects.CrownRootObject;
 import com.logitech.craft.mode.Mode;
+import com.logitech.craft.mode.Mode.ModeType;
 
 public class TouchEventHandler extends Handler implements Observer {
 
+
+	public static final String TouchEventMessageType = "crown_touch_event";
 	private static Timer timerToSwitchToSelectToolMode;
 
 	private static TimerTask timerTaskToSwitchToSelectToolMode;
@@ -25,6 +28,8 @@ public class TouchEventHandler extends Handler implements Observer {
 
 		if (co.touch_state == 1) {
 			activateTimer();
+			craft.getCurrentMode().doAction(co);
+			
 		}
 
 		if (co.touch_state == 0) {
@@ -51,7 +56,7 @@ public class TouchEventHandler extends Handler implements Observer {
 				craft.setToolMode(true);
 			}
 		};
-		timerToSwitchToSelectToolMode.schedule(timerTaskToSwitchToSelectToolMode, 800);
+		timerToSwitchToSelectToolMode.schedule(timerTaskToSwitchToSelectToolMode, 400);
 	}
 
 	private void deactivateTimer() {
