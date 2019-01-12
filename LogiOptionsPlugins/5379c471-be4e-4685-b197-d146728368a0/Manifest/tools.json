@@ -64,7 +64,7 @@
 					"name": "ZoomOption",
 					"image_file_path": "list.png",
 					"enabled": true,
-					"ratchet_enabled": true
+					"ratchet_enabled": false
 				}
 			]
 		},
