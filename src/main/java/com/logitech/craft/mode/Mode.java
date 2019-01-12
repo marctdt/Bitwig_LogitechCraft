@@ -1,20 +1,16 @@
 package com.logitech.craft.mode;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.logitech.craft.Craft;
 import com.logitech.craft.dataobjects.CrownRootObject;
-import com.logitech.craft.dataobjects.ToolChangeObject;
 
 public abstract class Mode {
 
 	public enum ModeType {
-		TRACKMODE, TRANSPORTMODE
+		TRANSPORTMODE,
+		TRACKMODE
 		//, DEVICEMODE //remove it as not functionnal
-		,BROWSERMODE
 		,TEMPOMODE
+		,BROWSERMODE
 	}
 	
 

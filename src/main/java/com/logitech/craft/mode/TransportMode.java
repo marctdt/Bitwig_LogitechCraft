@@ -17,10 +17,11 @@ public class TransportMode extends Mode{
 		if (co.message_type.equals(TurnEventHandler.TurnEventMessageType))
 		switch (co.task_options.current_tool_option) {
 		case "PositionOption":
-			craft.incTransportPosition( co.ratchet_delta);
+			craft.incTransportPosition( co.delta);
 			break;
-		case "TempoOption":
-			craft.incTempo((double)co.delta);
+		case "ZoomOption":
+			craft.IncVerticalZoom(co.ratchet_delta);
+
 			break;
 
 		default:

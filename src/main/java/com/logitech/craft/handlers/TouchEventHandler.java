@@ -56,7 +56,7 @@ public class TouchEventHandler extends Handler implements Observer {
 				craft.setToolMode(true);
 			}
 		};
-		timerToSwitchToSelectToolMode.schedule(timerTaskToSwitchToSelectToolMode, 400);
+		timerToSwitchToSelectToolMode.schedule(timerTaskToSwitchToSelectToolMode, 800);
 	}
 
 	private void deactivateTimer() {

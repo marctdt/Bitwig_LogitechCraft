@@ -9,6 +9,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import com.bitwig.extension.callback.DoubleValueChangedCallback;
+import com.bitwig.extension.controller.api.Application;
+import com.bitwig.extension.controller.api.Arranger;
 import com.bitwig.extension.controller.api.ControllerHost;
 import com.bitwig.extension.controller.api.CursorRemoteControlsPage;
 import com.bitwig.extension.controller.api.CursorTrack;
@@ -44,6 +46,8 @@ public class Craft implements Observer {
 	private PopupBrowser deviceBrowser;
 	private CursorRemoteControlsPage cursorRemoteControlsPage;
 	private DeviceBank deviceBank;
+	private Arranger arranger;
+	private Application application;
 
 	private CommandHandler commandHandler;
 
@@ -61,13 +65,13 @@ public class Craft implements Observer {
 		commandHandler = new CommandHandler(this);
 
 		modes = new HashMap<Mode.ModeType, Mode>();
-		modes.put(ModeType.TRACKMODE, new TrackMode(this));
 		modes.put(Mode.ModeType.TRANSPORTMODE, new TransportMode(this));
+		modes.put(ModeType.TRACKMODE, new TrackMode(this));
 		// modes.put(ModeType.DEVICEMODE, new DeviceMode(this));
 		modes.put(ModeType.BROWSERMODE, new BrowserMode(this));
 		modes.put(ModeType.TEMPOMODE, new TempoMode(this));
 		toolMode = new ToolMode(this);
-		currentMode = getMode(ModeType.TRACKMODE);
+		currentMode = getMode(ModeType.TRANSPORTMODE);
 		initViews();
 	}
 
@@ -89,6 +93,9 @@ public class Craft implements Observer {
 
 		deviceBank = cursorDevice.getCursorSlot().createDeviceBank(1);
 		cursorRemoteControlsPage = deviceBank.getDevice(0).createCursorRemoteControlsPage(2);
+		
+		arranger = host.createArranger();
+		application = host.createApplication();
 //		;
 //		cursorRemoteControlsPage.getParameter(0).value().addValueObserver(new DoubleValueChangedCallback() {
 //			
@@ -175,15 +182,26 @@ public class Craft implements Observer {
 		craftWSClient.sendToDevice(JSONMessage);
 	}
 
-	public void incTransportPosition(int value) {
+	public void incTransportPosition(double value) {
 
-//		transport.incPosition(calculateCenteredValue(value)*256, true);
+		transport.incPosition(calculateCenteredValue(value)*256, false);
 //		transport.incPosition(value, true);
+//		for (int i = 0; i < Math.abs(value); i++)
+//			if (value > 0)
+//				transport.fastForward();
+//			else if (value < 0)
+//				transport.rewind();
+	}
+	
+	public void IncVerticalZoom(int value) {
+		
 		for (int i = 0; i < Math.abs(value); i++)
-			if (value > 0)
-				transport.fastForward();
-			else if (value < 0)
-				transport.rewind();
+			if(value > 0)
+				application.zoomIn();
+			else if(value<0)
+				application.zoomOut();
+
+		
 	}
 
 	public void transportForward() {
@@ -275,7 +293,7 @@ public class Craft implements Observer {
 	public void initCraft() {
 
 		try {
-			switchTool(ModeType.TRACKMODE.name());
+			switchTool(currentMode.getModeType().name());
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

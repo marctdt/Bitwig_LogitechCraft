@@ -73,8 +73,8 @@
       "value": "Tempo"
     },
     {
-      "ID": "moveVertical",
-      "value": "Position Y"
+      "ID": "ZoomOption",
+      "value": "Zoom"
     },
     {
       "ID": "keystrokeassignment",

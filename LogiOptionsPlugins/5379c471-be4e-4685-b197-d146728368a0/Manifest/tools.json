@@ -1,168 +1,174 @@
 {
-  "GUID": "5379c471-be4e-4685-b197-d146728368a0",
-  "tools": [
-    {
-      "name": "TOOLMODE",
-      "enabled": true,
-      "tool_options": [
-        {
-          "index": 0,
-          "name": "TrackOption",
-          "image_file_path": "progressBar.png",
-          "enabled": true,
-          "ratchet_enabled": true
-        },
-        {
-          "index": 1,
-          "name": "TransportOption",
-          "image_file_path": "progressBar.png",
-          "enabled": true,
-          "ratchet_enabled": true
-        }
-      ]
-    },
-    {
-      "name": "TRACKMODE",
-      "enabled": true,
-      "tool_options": [
-        {
-          "index": 0,
-          "name": "TrackOption",
-          "image_file_path": "numericUpDown.png",
-          "enabled": true,
-          "ratchet_enabled": true
-        },
-        {
-          "index": 1,
-          "name": "VolumeOption",
-          "image_file_path": "numericUpDown.png",
-          "enabled": true,
-          "ratchet_enabled": false
-        },
-        {
-          "index": 2,
-          "name": "PanOption",
-          "image_file_path": "numericUpDown.png",
-          "enabled": true,
-          "ratchet_enabled": false
-        }
-      ]
-    },
-    {
-      "name": "TRANSPORTMODE",
-      "enabled": true,
-      "tool_options": [
-        {
-          "index": 0,
-          "name": "PositionOption",
-          "image_file_path": "list.png",
-          "enabled": true,
-          "ratchet_enabled": true
-        }
-      ]
-    },
-    {
-      "name": "DEVICEMODE",
-      "enabled": true,
-      "tool_options": [
-        {
-          "index": 0,
-          "name": "DeviceOption",
-          "image_file_path": "list.png",
-          "enabled": true,
-          "ratchet_enabled": true
-        },
-        {
-          "index": 1,
-          "name": "ParameterOption",
-          "image_file_path": "numericUpDown.png",
-          "enabled": true,
-          "ratchet_enabled": false
-        },
-        {
-          "index": 2,
-          "name": "DeviceParameterOption",
-          "image_file_path": "numericUpDown.png",
-          "enabled": true,
-          "ratchet_enabled": true
-        },
-        {
-          "index": 3,
-          "name": "DeviceBankOption",
-          "image_file_path": "numericUpDown.png",
-          "enabled": true,
-          "ratchet_enabled": true
-        }
-      ]
-    },
-    {
-      "name": "BROWSERMODE",
-      "enabled": true,
-      "tool_options": [
-        {
-          "index": 0,
-          "name": "SelectInBrowserOption",
-          "image_file_path": "list.png",
-          "enabled": true,
-          "ratchet_enabled": true
-        }
-      ]
-    },
-    {
-      "name": "TEMPOMODE",
-      "enabled": true,
-      "tool_options": [
-        {
-          "index": 0,
-          "name": "TempoOption",
-          "image_file_path": "list.png",
-          "enabled": true,
-          "ratchet_enabled": false
-        }
-      ]
-    }
-
-  ],
-  "tasks": [
-    {
-      "name": "changetoolvalue",
-      "win_id": "0x10064",
-      "mac_id": 615
-    },
-    {
-      "name": "zoom",
-      "image_file_path": "zoom.png",
-      "tool_options": [],
-      "mac_id": 309,
-      "win_id": "0x10057"
-    },
-    {
-      "name": "textsize",
-      "image_file_path": "textsize.png",
-      "tool_options": [],
-      "mac_id": 310,
-      "win_id": "0x10058"
-    },
-    {
-      "name": "undoredo",
-      "image_file_path": "undoredo.png",
-      "rotate_left_text": "undo",
-      "rotate_left_image_file_path": "undo.png",
-      "rotate_right_text": "redo",
-      "rotate_right_image_file_path": "redo.png",
-      "tool_options": []
-    },
-    {
-      "name": "keystrokeassignment",
-      "image_file_path": "",
-      "mac_id": 73,
-      "win_id": "0x10000"
-    },
-    {
-      "name": "playpause",
-      "image_file_path": "",
-      "mac_id": 4,
-      "win_id": "0x0004"
-    }
-  ]
+	"GUID": "5379c471-be4e-4685-b197-d146728368a0",
+	"tools": [
+		{
+			"name": "TOOLMODE",
+			"enabled": true,
+			"tool_options": [
+				{
+					"index": 0,
+					"name": "TrackOption",
+					"image_file_path": "progressBar.png",
+					"enabled": true,
+					"ratchet_enabled": true
+				},
+				{
+					"index": 1,
+					"name": "TransportOption",
+					"image_file_path": "progressBar.png",
+					"enabled": true,
+					"ratchet_enabled": true
+				}
+			]
+		},
+		{
+			"name": "TRACKMODE",
+			"enabled": true,
+			"tool_options": [
+				{
+					"index": 0,
+					"name": "TrackOption",
+					"image_file_path": "numericUpDown.png",
+					"enabled": true,
+					"ratchet_enabled": true
+				},
+				{
+					"index": 1,
+					"name": "VolumeOption",
+					"image_file_path": "numericUpDown.png",
+					"enabled": true,
+					"ratchet_enabled": false
+				},
+				{
+					"index": 2,
+					"name": "PanOption",
+					"image_file_path": "numericUpDown.png",
+					"enabled": true,
+					"ratchet_enabled": false
+				}
+			]
+		},
+		{
+			"name": "TRANSPORTMODE",
+			"enabled": true,
+			"tool_options": [
+				{
+					"index": 0,
+					"name": "PositionOption",
+					"image_file_path": "list.png",
+					"enabled": true,
+					"ratchet_enabled": false
+				},
+				{
+					"index": 1,
+					"name": "ZoomOption",
+					"image_file_path": "list.png",
+					"enabled": true,
+					"ratchet_enabled": true
+				}
+			]
+		},
+		{
+			"name": "DEVICEMODE",
+			"enabled": true,
+			"tool_options": [
+				{
+					"index": 0,
+					"name": "DeviceOption",
+					"image_file_path": "list.png",
+					"enabled": true,
+					"ratchet_enabled": true
+				},
+				{
+					"index": 1,
+					"name": "ParameterOption",
+					"image_file_path": "numericUpDown.png",
+					"enabled": true,
+					"ratchet_enabled": false
+				},
+				{
+					"index": 2,
+					"name": "DeviceParameterOption",
+					"image_file_path": "numericUpDown.png",
+					"enabled": true,
+					"ratchet_enabled": true
+				},
+				{
+					"index": 3,
+					"name": "DeviceBankOption",
+					"image_file_path": "numericUpDown.png",
+					"enabled": true,
+					"ratchet_enabled": true
+				}
+			]
+		},
+		{
+			"name": "BROWSERMODE",
+			"enabled": true,
+			"tool_options": [
+				{
+					"index": 0,
+					"name": "SelectInBrowserOption",
+					"image_file_path": "list.png",
+					"enabled": true,
+					"ratchet_enabled": true
+				}
+			]
+		},
+		{
+			"name": "TEMPOMODE",
+			"enabled": true,
+			"tool_options": [
+				{
+					"index": 0,
+					"name": "TempoOption",
+					"image_file_path": "list.png",
+					"enabled": true,
+					"ratchet_enabled": false
+				}
+			]
+		}
+	],
+	"tasks": [
+		{
+			"name": "changetoolvalue",
+			"win_id": "0x10064",
+			"mac_id": 615
+		},
+		{
+			"name": "zoom",
+			"image_file_path": "zoom.png",
+			"tool_options": [],
+			"mac_id": 309,
+			"win_id": "0x10057"
+		},
+		{
+			"name": "textsize",
+			"image_file_path": "textsize.png",
+			"tool_options": [],
+			"mac_id": 310,
+			"win_id": "0x10058"
+		},
+		{
+			"name": "undoredo",
+			"image_file_path": "undoredo.png",
+			"rotate_left_text": "undo",
+			"rotate_left_image_file_path": "undo.png",
+			"rotate_right_text": "redo",
+			"rotate_right_image_file_path": "redo.png",
+			"tool_options": []
+		},
+		{
+			"name": "keystrokeassignment",
+			"image_file_path": "",
+			"mac_id": 73,
+			"win_id": "0x10000"
+		},
+		{
+			"name": "playpause",
+			"image_file_path": "",
+			"mac_id": 4,
+			"win_id": "0x0004"
+		}
+	]
 }
