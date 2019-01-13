@@ -8,7 +8,7 @@ public abstract class Mode {
 	public enum ModeType {
 		TRANSPORTMODE,
 		TRACKMODE
-		//, DEVICEMODE //remove it as not functionnal
+		, DEVICEMODE //remove it as not functionnal
 		,TEMPOMODE
 		,BROWSERMODE
 	}

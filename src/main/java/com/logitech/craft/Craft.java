@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
@@ -15,6 +17,7 @@ import com.bitwig.extension.controller.api.Arranger;
 import com.bitwig.extension.controller.api.ControllerHost;
 import com.bitwig.extension.controller.api.CursorRemoteControlsPage;
 import com.bitwig.extension.controller.api.CursorTrack;
+import com.bitwig.extension.controller.api.Device;
 import com.bitwig.extension.controller.api.DeviceBank;
 import com.bitwig.extension.controller.api.PinnableCursorDevice;
 import com.bitwig.extension.controller.api.PopupBrowser;
@@ -30,6 +33,7 @@ import com.logitech.craft.dataobjects.ToolOption;
 import com.logitech.craft.dataobjects.ToolUpdateRootObject;
 import com.logitech.craft.handlers.CommandHandler;
 import com.logitech.craft.mode.BrowserMode;
+import com.logitech.craft.mode.DeviceMode;
 import com.logitech.craft.mode.Mode;
 import com.logitech.craft.mode.Mode.ModeType;
 import com.logitech.craft.mode.TempoMode;
@@ -62,6 +66,7 @@ public class Craft implements Observer {
 
 	private Mode currentMode;
 	private TrackBank trackBank;
+	private int currentParameterIndex;
 
 	public Craft(ControllerHost host) {
 		this.host = host;
@@ -71,7 +76,7 @@ public class Craft implements Observer {
 		modes = new HashMap<Mode.ModeType, Mode>();
 		modes.put(Mode.ModeType.TRANSPORTMODE, new TransportMode(this));
 		modes.put(ModeType.TRACKMODE, new TrackMode(this));
-		// modes.put(ModeType.DEVICEMODE, new DeviceMode(this));
+		modes.put(ModeType.DEVICEMODE, new DeviceMode(this));
 		modes.put(ModeType.BROWSERMODE, new BrowserMode(this));
 		modes.put(ModeType.TEMPOMODE, new TempoMode(this));
 		toolMode = new ToolMode(this);
@@ -87,7 +92,7 @@ public class Craft implements Observer {
 
 		transport = host.createTransport();
 
-		cursorTrack = host.createCursorTrack(99, 99);
+		cursorTrack = host.createCursorTrack(1, 1);
 
 		cursorDevice = cursorTrack.createCursorDevice();
 
@@ -95,12 +100,15 @@ public class Craft implements Observer {
 
 		deviceBrowser = host.createPopupBrowser();
 
-		deviceBank = cursorDevice.getCursorSlot().createDeviceBank(1);
-		cursorRemoteControlsPage = deviceBank.getDevice(0).createCursorRemoteControlsPage(2);
-		
+		deviceBank = cursorTrack.createDeviceBank(1);
+
+			deviceBank.getDevice(0).createCursorRemoteControlsPage(8);
+
+		cursorTrack.position().markInterested();
+
 		arranger = host.createArranger();
 		application = host.createApplication();
-		trackBank = host.createTrackBank(99, 99, 99);
+		trackBank = host.createTrackBank(1, 1, 1);
 		cursorTrack.sendBank().itemCount().markInterested();
 //		;
 //		cursorRemoteControlsPage.getParameter(0).value().addValueObserver(new DoubleValueChangedCallback() {
@@ -120,7 +128,6 @@ public class Craft implements Observer {
 ////				
 //			}
 //		});
-			
 
 //		transport.getPosition().addValueObserver(new DoubleValueChangedCallback() {
 //
@@ -184,7 +191,7 @@ public class Craft implements Observer {
 
 	public void incTransportPosition(double value) {
 
-		transport.incPosition(calculateCenteredValue(value)*256, false);
+		transport.incPosition(calculateCenteredValue(value) * 256, false);
 //		transport.incPosition(value, true);
 //		for (int i = 0; i < Math.abs(value); i++)
 //			if (value > 0)
@@ -192,16 +199,15 @@ public class Craft implements Observer {
 //			else if (value < 0)
 //				transport.rewind();
 	}
-	
+
 	public void IncVerticalZoom(int value) {
-		
+
 		for (int i = 0; i < Math.abs(value); i++)
-			if(value > 0)
+			if (value > 0)
 				application.zoomIn();
-			else if(value<0)
+			else if (value < 0)
 				application.zoomOut();
 
-		
 	}
 
 	public void transportForward() {
@@ -294,7 +300,8 @@ public class Craft implements Observer {
 
 		try {
 			switchTool(currentMode.getModeType().name());
-			currentSend=0;
+			currentSend = 0;
+			currentParameterIndex = 0;
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -328,31 +335,43 @@ public class Craft implements Observer {
 	}
 
 	public void incSelectedDeviceParametr(int delta) {
-
-		cursorTrack.createDeviceBank(0).getDevice(0).createCursorRemoteControlsPage(2).getParameter(0)
-				.inc(calculateCenteredValue(delta));
+		cursorRemoteControlsPage.getParameter(currentParameterIndex).inc(calculateCenteredValue(delta));
+		;
 	}
 
 	public void selectNextDeviceParameterBank(int repeatTime) {
 		for (int i = 0; i < Math.abs(repeatTime); i++)
-			cursorDevice.nextParameterPage();
+			cursorRemoteControlsPage.selectNextPage(false);
 
 	}
 
 	public void selectPreviousDeviceParameterBank(int repeatTime) {
 		for (int i = 0; i < Math.abs(repeatTime); i++)
-			cursorDevice.previousParameterPage();
+			cursorRemoteControlsPage.selectPreviousPage(false);
 	}
 
 	public void selectNextDeviceParameter(int repeatTime) {
-		for (int i = 0; i < Math.abs(repeatTime); i++)
-			cursorTrack.createDeviceBank(0).getDevice(0).createCursorRemoteControlsPage(0).selectNext();
+		for (int i = 0; i < Math.abs(repeatTime); i++) {
+			if (currentParameterIndex + 1 < cursorRemoteControlsPage.getParameterCount())
+				currentParameterIndex++;
+			try {
+				ReportToolOptionDataValueChange(ModeType.DEVICEMODE, "DeviceParameterOption",
+						Integer.toString(currentParameterIndex+1));
+			} catch (IllegalAccessException | IOException e) {
+			}
+		}
 	}
 
 	public void selectPreviousDeviceParameter(int repeatTime) {
 
 		for (int i = 0; i < Math.abs(repeatTime); i++)
-			cursorTrack.createDeviceBank(0).getDevice(0).createCursorRemoteControlsPage(0).selectPrevious();
+			if (currentParameterIndex - 1 >= 0)
+				currentParameterIndex--;
+		try {
+			ReportToolOptionDataValueChange(ModeType.DEVICEMODE, "DeviceParameterOption",
+					Integer.toString(currentParameterIndex+1));
+		} catch (IllegalAccessException | IOException e) {
+		}
 	}
 
 	public void selectNextDeviceInBrowser(int repeatTime) {
@@ -370,56 +389,48 @@ public class Craft implements Observer {
 	}
 
 	public void incSelectedSend(int delta) {
-		
 
-{
-	
-	try {
-	Send s = ((Send)cursorDevice.channel().sendBank().getItemAt(currentSend));
-		
+		{
 
-		s.inc(calculateCenteredValue(delta));
-	}catch(Exception e)
-	{
-		host.println(e.getMessage());
+			try {
+				Send s = ((Send) cursorDevice.channel().sendBank().getItemAt(currentSend));
+
+				s.inc(calculateCenteredValue(delta));
+			} catch (Exception e) {
+				host.println(e.getMessage());
+			}
+		}
 	}
-}
-	}
-	
+
 	private int currentSend;
 
 	public void selectSend(int ratchet_delta) {
-		
 
-		int itemCount = cursorDevice.channel().sendBank().itemCount().get()-1;
-		if(itemCount>-1)
+		int itemCount = cursorDevice.channel().sendBank().itemCount().get() - 1;
+		if (itemCount > -1)
 			for (int i = 0; i < Math.abs(ratchet_delta); i++) {
-			if(ratchet_delta>0)
-			{
-				currentSend++;
-				if(currentSend > itemCount)
-					currentSend=itemCount;
+				if (ratchet_delta > 0) {
+					currentSend++;
+					if (currentSend > itemCount)
+						currentSend = itemCount;
+				} else if (ratchet_delta < 0) {
+					currentSend--;
+					if (currentSend < 0)
+						currentSend = 0;
+				}
 			}
-			else if(ratchet_delta<0)
-			{
-				currentSend--;
-				if(currentSend<0)
-					currentSend = 0;
-			}
-		}
-		
-		try {
-		if(itemCount>-1)
-			ReportToolOptionDataValueChange(ModeType.TRACKMODE, "SelectSendOption", "Send "+Integer.toString(currentSend+1));
-		else
-			ReportToolOptionDataValueChange(ModeType.TRACKMODE, "SelectSendOption", "The track has no send");
 
-			
+		try {
+			if (itemCount > -1)
+				ReportToolOptionDataValueChange(ModeType.TRACKMODE, "SelectSendOption",
+						"Send " + Integer.toString(currentSend + 1));
+			else
+				ReportToolOptionDataValueChange(ModeType.TRACKMODE, "SelectSendOption", "The track has no send");
+
 		} catch (IllegalAccessException | IOException e) {
 			// TODO Auto-generated catch block
 			host.println("cannot update craft plugin");
 		}
 	}
-	
-	
+
 }
