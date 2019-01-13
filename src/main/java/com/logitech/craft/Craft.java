@@ -392,7 +392,7 @@ public class Craft implements Observer {
 		
 
 		int itemCount = cursorDevice.channel().sendBank().itemCount().get()-1;
-		if(itemCount>0)
+		if(itemCount>-1)
 			for (int i = 0; i < Math.abs(ratchet_delta); i++) {
 			if(ratchet_delta>0)
 			{
@@ -409,7 +409,7 @@ public class Craft implements Observer {
 		}
 		
 		try {
-		if(itemCount>0)
+		if(itemCount>-1)
 			ReportToolOptionDataValueChange(ModeType.TRACKMODE, "SelectSendOption", "Send "+Integer.toString(currentSend+1));
 		else
 			ReportToolOptionDataValueChange(ModeType.TRACKMODE, "SelectSendOption", "The track has no send");
