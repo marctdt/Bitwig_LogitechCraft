@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+import com.bitwig.extension.callback.BooleanValueChangedCallback;
 import com.bitwig.extension.callback.DoubleValueChangedCallback;
 import com.bitwig.extension.controller.api.Application;
 import com.bitwig.extension.controller.api.Arranger;
@@ -17,6 +18,8 @@ import com.bitwig.extension.controller.api.CursorTrack;
 import com.bitwig.extension.controller.api.DeviceBank;
 import com.bitwig.extension.controller.api.PinnableCursorDevice;
 import com.bitwig.extension.controller.api.PopupBrowser;
+import com.bitwig.extension.controller.api.Send;
+import com.bitwig.extension.controller.api.TrackBank;
 import com.bitwig.extension.controller.api.Transport;
 import com.google.gson.Gson;
 import com.logitech.connectivity.CraftSocketConnection;
@@ -58,6 +61,7 @@ public class Craft implements Observer {
 	private ToolMode toolMode;
 
 	private Mode currentMode;
+	private TrackBank trackBank;
 
 	public Craft(ControllerHost host) {
 		this.host = host;
@@ -83,7 +87,7 @@ public class Craft implements Observer {
 
 		transport = host.createTransport();
 
-		cursorTrack = host.createCursorTrack(0, 0);
+		cursorTrack = host.createCursorTrack(99, 99);
 
 		cursorDevice = cursorTrack.createCursorDevice();
 
@@ -96,6 +100,8 @@ public class Craft implements Observer {
 		
 		arranger = host.createArranger();
 		application = host.createApplication();
+		trackBank = host.createTrackBank(99, 99, 99);
+		cursorTrack.sendBank().itemCount().markInterested();
 //		;
 //		cursorRemoteControlsPage.getParameter(0).value().addValueObserver(new DoubleValueChangedCallback() {
 //			
@@ -106,21 +112,15 @@ public class Craft implements Observer {
 //			}
 //		});
 
-//		cursor.addIsSelectedInEditorObserver(new BooleanValueChangedCallback() {
+//		cursorTrack.addIsSelectedInEditorObserver(new BooleanValueChangedCallback() {
+//			
 //			@Override
 //			public void valueChanged(boolean newValue) {
-//					try {
-//						toolChange(CraftTool.TRACK);
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						host.showPopupNotification("Cannot change the tool");
-//					}
-//					catch (IllegalAccessError e)
-//					{
-//						
-//					}
+//				// TODO Auto-generated method stub
+////				
 //			}
 //		});
+			
 
 //		transport.getPosition().addValueObserver(new DoubleValueChangedCallback() {
 //
@@ -294,6 +294,7 @@ public class Craft implements Observer {
 
 		try {
 			switchTool(currentMode.getModeType().name());
+			currentSend=0;
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -367,4 +368,58 @@ public class Craft implements Observer {
 		}
 
 	}
+
+	public void incSelectedSend(int delta) {
+		
+
+{
+	
+	try {
+	Send s = ((Send)cursorDevice.channel().sendBank().getItemAt(currentSend));
+		
+
+		s.inc(calculateCenteredValue(delta));
+	}catch(Exception e)
+	{
+		host.println(e.getMessage());
+	}
+}
+	}
+	
+	private int currentSend;
+
+	public void selectSend(int ratchet_delta) {
+		
+
+		int itemCount = cursorDevice.channel().sendBank().itemCount().get()-1;
+		if(itemCount>0)
+			for (int i = 0; i < Math.abs(ratchet_delta); i++) {
+			if(ratchet_delta>0)
+			{
+				currentSend++;
+				if(currentSend > itemCount)
+					currentSend=itemCount;
+			}
+			else if(ratchet_delta<0)
+			{
+				currentSend--;
+				if(currentSend<0)
+					currentSend = 0;
+			}
+		}
+		
+		try {
+		if(itemCount>0)
+			ReportToolOptionDataValueChange(ModeType.TRACKMODE, "SelectSendOption", "Send "+Integer.toString(currentSend+1));
+		else
+			ReportToolOptionDataValueChange(ModeType.TRACKMODE, "SelectSendOption", "The track has no send");
+
+			
+		} catch (IllegalAccessException | IOException e) {
+			// TODO Auto-generated catch block
+			host.println("cannot update craft plugin");
+		}
+	}
+	
+	
 }

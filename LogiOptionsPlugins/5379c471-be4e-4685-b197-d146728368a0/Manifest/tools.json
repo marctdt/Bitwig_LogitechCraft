@@ -45,6 +45,20 @@
 					"image_file_path": "numericUpDown.png",
 					"enabled": true,
 					"ratchet_enabled": false
+				},
+				{
+					"index": 3,
+					"name": "SendOption",
+					"image_file_path": "numericUpDown.png",
+					"enabled": true,
+					"ratchet_enabled": false
+				},
+				{
+					"index": 4,
+					"name": "SendSelectOption",
+					"image_file_path": "numericUpDown.png",
+					"enabled": true,
+					"ratchet_enabled": true
 				}
 			]
 		},

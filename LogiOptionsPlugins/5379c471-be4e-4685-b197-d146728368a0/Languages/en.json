@@ -73,12 +73,12 @@
       "value": "Tempo"
     },
     {
-      "ID": "ZoomOption",
-      "value": "Zoom"
+      "ID": "SendOption",
+      "value": "Send"
     },
     {
-      "ID": "keystrokeassignment",
-      "value": "Keystroke assignment"
+      "ID": "SendSelectOption",
+      "value": "Select Send Track"
     },
     {
       "ID": "tint",

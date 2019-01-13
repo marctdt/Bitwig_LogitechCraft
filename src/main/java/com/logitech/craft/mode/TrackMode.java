@@ -31,6 +31,12 @@ public class TrackMode extends Mode{
 		case "PanOption":
 			craft.incPanCurrentTrack(co.delta);
 			break;
+		case "SendOption":
+			craft.incSelectedSend(co.delta);
+			break;
+		case "SendSelectOption":
+			craft.selectSend(co.ratchet_delta);
+			break;
 		default:
 			break;
 		}
