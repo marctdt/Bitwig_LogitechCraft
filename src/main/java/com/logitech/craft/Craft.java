@@ -51,7 +51,7 @@ public class Craft implements Observer {
 	private PinnableCursorDevice cursorDevice;
 //	private DeviceBank deviceBank;
 	private PopupBrowser deviceBrowser;
-	private CursorRemoteControlsPage cursorRemoteControlsPage;
+//	private CursorRemoteControlsPage cursorRemoteControlsPage;
 	private DeviceBank deviceBank;
 	private Arranger arranger;
 	private Application application;
@@ -67,6 +67,7 @@ public class Craft implements Observer {
 	private Mode currentMode;
 	private TrackBank trackBank;
 	private int currentParameterIndex;
+	private List<CursorRemoteControlsPage> cursorRemoteControlsPages;
 
 	public Craft(ControllerHost host) {
 		this.host = host;
@@ -95,14 +96,26 @@ public class Craft implements Observer {
 		cursorTrack = host.createCursorTrack(1, 1);
 
 		cursorDevice = cursorTrack.createCursorDevice();
+		cursorDevice.position().markInterested();
 
 //		deviceBank = cursorTrack.createDeviceBank(0);
 
 		deviceBrowser = host.createPopupBrowser();
 
-		deviceBank = cursorTrack.createDeviceBank(1);
+		deviceBank = cursorTrack.createDeviceBank(99);
 
-			deviceBank.getDevice(0).createCursorRemoteControlsPage(8);
+		cursorRemoteControlsPages = new ArrayList<CursorRemoteControlsPage>();
+		for (int i = 0; i < deviceBank.getCapacityOfBank(); i++) {
+			
+		cursorRemoteControlsPages.add(deviceBank.getDevice(i).createCursorRemoteControlsPage(8));
+		cursorRemoteControlsPages.get(i).selectedPageIndex().markInterested();
+		cursorRemoteControlsPages.get(i).getName().markInterested();
+		
+		for (int c = 0; c < cursorRemoteControlsPages.get(i).getParameterCount(); c++) {
+			cursorRemoteControlsPages.get(i).getParameter(c).name().markInterested();
+
+		}
+		}
 
 		cursorTrack.position().markInterested();
 
@@ -110,6 +123,7 @@ public class Craft implements Observer {
 		application = host.createApplication();
 		trackBank = host.createTrackBank(1, 1, 1);
 		cursorTrack.sendBank().itemCount().markInterested();
+		
 //		;
 //		cursorRemoteControlsPage.getParameter(0).value().addValueObserver(new DoubleValueChangedCallback() {
 //			
@@ -335,28 +349,46 @@ public class Craft implements Observer {
 	}
 
 	public void incSelectedDeviceParametr(int delta) {
-		cursorRemoteControlsPage.getParameter(currentParameterIndex).inc(calculateCenteredValue(delta));
-		;
+		cursorRemoteControlsPages.get(cursorDevice.position().get()).getParameter(currentParameterIndex).inc(calculateCenteredValue(delta));
+		try {
+			String parameterName = cursorRemoteControlsPages.get(cursorDevice.position().get()).getParameter(currentParameterIndex).name().get();
+			ReportToolOptionDataValueChange(ModeType.DEVICEMODE, "ParameterOption",
+					"Parameter " + Integer.toString(currentParameterIndex + 1) + ": " + parameterName);
+		} catch (IllegalAccessException | IOException e) {
+		}
 	}
 
 	public void selectNextDeviceParameterBank(int repeatTime) {
 		for (int i = 0; i < Math.abs(repeatTime); i++)
-			cursorRemoteControlsPage.selectNextPage(false);
+			cursorRemoteControlsPages.get(cursorDevice.position().get()).selectNextPage(false);
+		try {
+			String bankName = cursorRemoteControlsPages.get(cursorDevice.position().get()).getName().get();
+			ReportToolOptionDataValueChange(ModeType.DEVICEMODE, "DeviceBankOption", "Page "
+					+ Integer.toString(cursorRemoteControlsPages.get(cursorDevice.position().get()).selectedPageIndex().get() + 1) + ": " + bankName);
+		} catch (IllegalAccessException | IOException e) {
+		}
 
 	}
 
 	public void selectPreviousDeviceParameterBank(int repeatTime) {
 		for (int i = 0; i < Math.abs(repeatTime); i++)
-			cursorRemoteControlsPage.selectPreviousPage(false);
+			cursorRemoteControlsPages.get(cursorDevice.position().get()).selectPreviousPage(false);
+		try {
+			String bankName = cursorRemoteControlsPages.get(cursorDevice.position().get()).getName().get();
+			ReportToolOptionDataValueChange(ModeType.DEVICEMODE, "DeviceBankOption", "Page "
+					+ Integer.toString(cursorRemoteControlsPages.get(cursorDevice.position().get()).selectedPageIndex().get() + 1) + ": " + bankName);
+		} catch (IllegalAccessException | IOException e) {
+		}
 	}
 
 	public void selectNextDeviceParameter(int repeatTime) {
 		for (int i = 0; i < Math.abs(repeatTime); i++) {
-			if (currentParameterIndex + 1 < cursorRemoteControlsPage.getParameterCount())
+			if (currentParameterIndex + 1 < cursorRemoteControlsPages.get(cursorDevice.position().get()).getParameterCount())
 				currentParameterIndex++;
 			try {
+				String parameterName = cursorRemoteControlsPages.get(cursorDevice.position().get()).getParameter(currentParameterIndex).name().get();
 				ReportToolOptionDataValueChange(ModeType.DEVICEMODE, "DeviceParameterOption",
-						Integer.toString(currentParameterIndex+1));
+						"Parameter " + Integer.toString(currentParameterIndex + 1) + ": " + parameterName);
 			} catch (IllegalAccessException | IOException e) {
 			}
 		}
@@ -368,8 +400,9 @@ public class Craft implements Observer {
 			if (currentParameterIndex - 1 >= 0)
 				currentParameterIndex--;
 		try {
+			String parameterName = cursorRemoteControlsPages.get(cursorDevice.position().get()).getParameter(currentParameterIndex).name().get();
 			ReportToolOptionDataValueChange(ModeType.DEVICEMODE, "DeviceParameterOption",
-					Integer.toString(currentParameterIndex+1));
+					"Parameter " + Integer.toString(currentParameterIndex + 1) + ": " + parameterName);
 		} catch (IllegalAccessException | IOException e) {
 		}
 	}
