@@ -81,8 +81,8 @@
       "value": "Select Send Track"
     },
     {
-      "ID": "tint",
-      "value": "Tint"
+      "ID": "ZoomOption",
+      "value": "Zoom"
     },
     {
       "ID": "playpause",
