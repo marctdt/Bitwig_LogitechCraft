@@ -32,14 +32,27 @@ public class ToolMode extends Mode {
 
 	public void nextMode(String currentMode) throws IllegalAccessException {
 		int i = modes.indexOf(ModeType.valueOf(currentMode));
-		currentMode = modes.get((i + 1) % modes.size()).name();
-		craft.switchTool(currentMode);
+		int nextMode = i +1;
+		
+		if (nextMode < modes.size())
+		{
+			currentMode = modes.get(nextMode).name();
+			craft.switchTool(currentMode);
+		}
+		//currentMode = modes.get((i + 1) % modes.size()).name();
+		
 	}
 
 	public void previousMode(String currentMode) throws IllegalAccessException {
 		int newi = modes.indexOf(ModeType.valueOf(currentMode)) - 1;
-		currentMode = modes.get(newi < 0 ? modes.size() -1: newi).name();
-		craft.switchTool(currentMode);
+		
+		if (!(newi<0))
+		{
+			currentMode = modes.get(newi).name();
+			craft.switchTool(currentMode);
+		}
+		//currentMode = modes.get(newi < 0 ? modes.size() -1: newi).name();
+		
 	}
 	
 }
